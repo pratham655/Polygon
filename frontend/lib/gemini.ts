@@ -9,12 +9,36 @@ const client = new OpenAI({
 export async function askPolygon(
   prompt: string
 ) {
-  return JSON.stringify({
-    keyExists: !!process.env.NEXT_PUBLIC_OPENROUTER_API_KEY,
-    keyPrefix:
-      process.env.NEXT_PUBLIC_OPENROUTER_API_KEY?.substring(
-        0,
-        15
-      ),
-  });
+  try {
+    const safePrompt =
+      prompt.substring(0, 3000);
+
+    const completion =
+      await client.chat.completions.create({
+        model:
+          "meta-llama/llama-3.1-8b-instruct:free",
+
+        messages: [
+          {
+            role: "user",
+            content: safePrompt,
+          },
+        ],
+
+        max_tokens: 1000,
+      });
+
+    return (
+      completion.choices[0].message
+        .content || "No response."
+    );
+  } catch (error: any) {
+    console.error(error);
+
+    return JSON.stringify(
+      error,
+      null,
+      2
+    );
+  }
 }
