@@ -16,7 +16,7 @@ export async function askPolygon(
 
     const completion =
       await client.chat.completions.create({
-        model: "openai/gpt-3.5-turbo",
+        model: "meta-llama/llama-3.1-8b-instruct:free",
 
         messages: [
           {
@@ -33,9 +33,13 @@ export async function askPolygon(
         .content || "No response."
     );
 
-  } catch (error) {
-    console.error(error);
+  } catch (error: any) {
+  console.error(error);
 
-    return "Something went wrong.";
-  }
+  return JSON.stringify(
+    error,
+    null,
+    2
+  );
+}
 }
