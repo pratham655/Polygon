@@ -28,10 +28,11 @@ export async function askPolygon(
         max_tokens: 1000,
       });
 
-    return (
-      completion.choices[0].message
-        .content || "No response."
-    );
+    return JSON.stringify(
+  completion,
+  null,
+  2
+);
   } catch (error: any) {
     console.error(error);
 
