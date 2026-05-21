@@ -6,17 +6,39 @@ const client = new OpenAI({
   dangerouslyAllowBrowser: true,
 });
 
-const safePrompt = "";
+export async function askPolygon(
+  prompt: string
+) {
+  try {
+    const safePrompt =
+      prompt.substring(0, 3000);
 
-const completion =
-  await client.chat.completions.create({
-    model:
-      "meta-llama/llama-3.1-8b-instruct:free",
-    messages: [
-      {
-        role: "user",
-        content: safePrompt,
-      },
-    ],
-    max_tokens: 1000,
-  });
+    const completion =
+      await client.chat.completions.create({
+        model:
+          "meta-llama/llama-3.1-8b-instruct:free",
+
+        messages: [
+          {
+            role: "user",
+            content: safePrompt,
+          },
+        ],
+
+        max_tokens: 1000,
+      });
+
+    return (
+      completion.choices[0].message
+        .content || "No response."
+    );
+  } catch (error: any) {
+    console.error(error);
+
+    return JSON.stringify(
+      error,
+      null,
+      2
+    );
+  }
+}
