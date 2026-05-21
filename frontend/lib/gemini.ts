@@ -16,7 +16,7 @@ export async function askPolygon(
     const completion =
       await client.chat.completions.create({
         model:
-          "google/gemma-3-12b-it:free",
+          "openrouter/auto",
 
         messages: [
           {
