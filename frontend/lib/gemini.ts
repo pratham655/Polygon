@@ -6,27 +6,34 @@ const client = new OpenAI({
   dangerouslyAllowBrowser: true,
 });
 
-export async function askPolygon(prompt: string) {
-
+export async function askPolygon(
+  prompt: string
+) {
   try {
 
-    const completion = await client.chat.completions.create({
+    const safePrompt =
+      prompt.substring(0, 3000);
 
-      model: "openai/gpt-3.5-turbo",
+    const completion =
+      await client.chat.completions.create({
+        model: "openai/gpt-3.5-turbo",
 
-      messages: [
-        {
-          role: "user",
-          content: prompt,
-        },
-      ],
+        messages: [
+          {
+            role: "user",
+            content: safePrompt,
+          },
+        ],
 
-    });
+        max_tokens: 1000,
+      });
 
-    return completion.choices[0].message.content || "No response.";
+    return (
+      completion.choices[0].message
+        .content || "No response."
+    );
 
   } catch (error) {
-
     console.error(error);
 
     return "Something went wrong.";

@@ -2,6 +2,10 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
+import {
+  SignInButton,
+  UserButton,
+} from "@clerk/nextjs";
 
 export default function Home() {
   return (
@@ -17,11 +21,17 @@ export default function Home() {
           Polygon
         </h1>
 
-        <Link href="/dashboard">
-          <button className="px-5 py-2 rounded-full bg-white text-black font-medium hover:scale-105 transition cursor-pointer">
-            Get Started
-          </button>
-        </Link>
+        <div className="flex items-center gap-4">
+
+          <SignInButton mode="modal">
+            <button className="px-5 py-2 rounded-full bg-white text-black font-medium hover:scale-105 transition">
+              Sign In
+            </button>
+          </SignInButton>
+
+          <UserButton />
+
+        </div>
 
       </nav>
 
@@ -34,13 +44,10 @@ export default function Home() {
           transition={{ duration: 0.8 }}
           className="text-6xl md:text-8xl font-extrabold leading-tight"
         >
-
           Your Adaptive
-
           <span className="bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">
             {" "}AI Tutor
           </span>
-
         </motion.h1>
 
         <motion.p
@@ -50,11 +57,11 @@ export default function Home() {
           className="mt-8 max-w-2xl text-lg text-gray-300"
         >
           Learn smarter with AI-powered explanations,
-          viva training, adaptive quizzes, and
+          viva training, adaptive quizzes and
           personalized revision experiences.
         </motion.p>
 
-        {/* Buttons */}
+        {/* Hero Buttons */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -63,57 +70,44 @@ export default function Home() {
         >
 
           <Link href="/workspace">
-
-            <button className="px-8 py-4 rounded-2xl bg-gradient-to-r from-cyan-500 to-purple-500 font-semibold hover:scale-105 transition cursor-pointer">
-
+            <button className="px-8 py-4 rounded-2xl bg-gradient-to-r from-cyan-500 to-purple-500 font-semibold hover:scale-105 transition">
               Start Learning
-
             </button>
-
           </Link>
 
-          <Link href="/dashboard">
-
-            <button className="px-8 py-4 rounded-2xl border border-white/20 bg-white/10 backdrop-blur-md hover:bg-white/20 transition cursor-pointer">
-
+          <Link href="/upload">
+            <button className="px-8 py-4 rounded-2xl border border-white/20 bg-white/10 backdrop-blur-md hover:bg-white/20 transition">
               Upload Notes
-
             </button>
-
           </Link>
 
         </motion.div>
 
       </section>
 
-      {/* Features Section */}
+      {/* Features */}
       <section className="relative z-10 px-6 py-28">
 
         <div className="max-w-6xl mx-auto grid md:grid-cols-3 gap-8">
 
-          {/* Card 1 */}
           <motion.div
             whileHover={{ scale: 1.05 }}
             className="p-8 rounded-3xl bg-white/10 border border-white/10 backdrop-blur-xl"
           >
-
             <h2 className="text-2xl font-bold mb-4">
               Smart AI Explanations
             </h2>
 
             <p className="text-gray-300">
               Learn topics in easy mode, technical mode,
-              analogy mode, or quick revision mode instantly.
+              analogy mode and quick revision mode instantly.
             </p>
-
           </motion.div>
 
-          {/* Card 2 */}
           <motion.div
             whileHover={{ scale: 1.05 }}
             className="p-8 rounded-3xl bg-white/10 border border-white/10 backdrop-blur-xl"
           >
-
             <h2 className="text-2xl font-bold mb-4">
               Adaptive Quizzes
             </h2>
@@ -122,24 +116,20 @@ export default function Home() {
               Polygon analyzes your understanding and adjusts
               question difficulty dynamically.
             </p>
-
           </motion.div>
 
-          {/* Card 3 */}
           <motion.div
             whileHover={{ scale: 1.05 }}
             className="p-8 rounded-3xl bg-white/10 border border-white/10 backdrop-blur-xl"
           >
-
             <h2 className="text-2xl font-bold mb-4">
               Viva & Placement Prep
             </h2>
 
             <p className="text-gray-300">
-              Practice viva questions, HR rounds,
-              technical interviews, and confidence-building sessions.
+              Practice viva questions, technical interviews,
+              HR rounds and confidence-building sessions.
             </p>
-
           </motion.div>
 
         </div>
@@ -155,17 +145,13 @@ export default function Home() {
 
         <p className="mt-6 max-w-2xl text-gray-400 text-lg">
           Your personal AI tutor designed for students,
-          viva preparation, placements, and concept mastery.
+          viva preparation, placements and concept mastery.
         </p>
 
         <Link href="/workspace">
-
-          <button className="mt-10 px-10 py-4 rounded-2xl bg-gradient-to-r from-purple-500 to-cyan-500 font-semibold hover:scale-105 transition cursor-pointer">
-
+          <button className="mt-10 px-10 py-4 rounded-2xl bg-gradient-to-r from-purple-500 to-cyan-500 font-semibold hover:scale-105 transition">
             Launch Polygon
-
           </button>
-
         </Link>
 
       </section>
