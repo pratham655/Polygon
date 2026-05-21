@@ -1,15 +1,11 @@
 "use client";
 
-import { useCallback, useState } from "react";
-import { useDropzone } from "react-dropzone";
+import { useState } from "react";
 import { askPolygon } from "../../lib/gemini";
 
 export default function UploadPage() {
-  const [fileName, setFileName] =
-    useState("");
-
-  const [pdfText, setPdfText] =
-    useState("");
+  const [topic, setTopic] = useState("");
+  const [count, setCount] = useState(10);
 
   const [loading, setLoading] =
     useState(false);
@@ -17,173 +13,201 @@ export default function UploadPage() {
   const [aiResponse, setAiResponse] =
     useState("");
 
-  const onDrop = useCallback(
-  async (acceptedFiles: File[]) => {
-    if (acceptedFiles.length === 0)
-      return;
-
-    const file = acceptedFiles[0];
-
-    setFileName(file.name);
-
-    setPdfText(`
-Engineering Notes Uploaded
-
-Filename: ${file.name}
-
-These notes are ready for AI processing.
-
-(Polygon V1 Placeholder Content)
-`);
-  },
-  []
-);
-
-  const {
-    getRootProps,
-    getInputProps,
-  } = useDropzone({
-    accept: {
-      "application/pdf": [".pdf"],
-    },
-    onDrop,
-  });
-
   async function askAI(
-  type: "summary" | "viva" | "quiz" | "flashcards"
-) {
-  if (!pdfText) {
-    alert("No notes loaded.");
-    return;
-  }
+    type:
+      | "summary"
+      | "viva"
+      | "quiz"
+      | "flashcards"
+  ) {
+    if (!topic.trim()) {
+      alert("Please enter a topic.");
+      return;
+    }
 
-  setLoading(true);
+    setLoading(true);
 
-  // HARD LIMIT
-  const limitedText = pdfText.substring(0, 2000);
+    let prompt = "";
 
-  let prompt = "";
+    switch (type) {
+      case "summary":
+        prompt = `
+Create complete engineering study notes on:
 
-  switch (type) {
-    case "summary":
-      prompt = `
-Summarize these engineering notes:
+${topic}
 
-${limitedText}
+Include:
 
-Provide:
-1. Chapter Summary
-2. Important Concepts
-3. Key Formulas
-4. Exam Tips
+1. Introduction
+2. Definition
+3. Working Principle
+4. Important Concepts
+5. Key Components
+6. Advantages
+7. Disadvantages
+8. Applications
+9. Important Formulae (if applicable)
+10. Exam Tips
+11. Frequently Asked Questions
+12. Quick Revision Notes
+
+Use clear headings and student-friendly explanations.
 `;
-      break;
+        break;
 
-    case "viva":
-      prompt = `
-Using these notes:
+      case "viva":
+        prompt = `
+Generate ${count} viva questions with detailed answers on:
 
-${limitedText}
+${topic}
 
-Generate:
-1. 10 Viva Questions
-2. Detailed Answers
-3. Frequently Asked Questions
-`;
-      break;
+Requirements:
 
-    case "quiz":
-      prompt = `
-Create 10 MCQs from:
-
-${limitedText}
+- Start with basic questions.
+- Then intermediate questions.
+- Then advanced questions.
+- Answers should be easy to understand.
+- Include important interview/viva questions.
+- Cover different concepts of the topic.
 
 Format:
 
-Question
-A)
-B)
-C)
-D)
+Question 1:
+...
 
-Correct Answer
+Answer:
+...
+
+Continue until ${count} questions are generated.
 `;
-      break;
+        break;
 
-    case "flashcards":
-      prompt = `
-Create study flashcards from:
+      case "quiz":
+        prompt = `
+Generate ${count} UNIQUE multiple-choice questions (MCQs) on:
 
-${limitedText}
+${topic}
+
+Requirements:
+
+- Every question must be different.
+- Cover different subtopics of ${topic}.
+- Mix Easy, Medium and Hard difficulty levels.
+- Do NOT repeat concepts.
+- Provide exactly 4 options (A, B, C, D).
+- Mention the correct answer after every question.
+- Add a short explanation for the correct answer.
+- Make questions exam-oriented.
+- Use proper numbering.
 
 Format:
+
+Question 1:
+...
+
+A) ...
+B) ...
+C) ...
+D) ...
+
+Correct Answer: B
+
+Explanation:
+...
+
+Continue until ${count} questions are generated.
+`;
+        break;
+
+      case "flashcards":
+        prompt = `
+Generate ${count} study flashcards on:
+
+${topic}
+
+Requirements:
+
+- Cover definitions.
+- Cover important concepts.
+- Cover formulas if applicable.
+- Cover applications.
+- Keep answers concise and easy to memorize.
+
+Format:
+
+Flashcard 1
 
 Question:
+...
+
 Answer:
+...
+
+Continue until ${count} flashcards are generated.
 `;
-      break;
+        break;
+    }
+
+    try {
+      const result = await askPolygon(
+        prompt
+      );
+
+      setAiResponse(result);
+    } catch (error) {
+      console.error(error);
+
+      setAiResponse(
+        "Failed to generate AI response."
+      );
+    }
+
+    setLoading(false);
   }
-
-  console.log(
-    "Prompt length:",
-    prompt.length
-  );
-
-  try {
-    const result = await askPolygon(prompt);
-
-    setAiResponse(result);
-
-  } catch (error) {
-    console.error(error);
-
-    setAiResponse(
-      "Failed to generate AI response."
-    );
-  }
-
-  setLoading(false);
-}
 
   return (
     <main className="min-h-screen bg-black text-white px-6 py-10">
-
       <div className="max-w-5xl mx-auto">
 
         <h1 className="text-5xl font-bold text-center mb-10">
-          Upload Notes
+          Polygon AI Study Assistant
         </h1>
 
-        <div
-          {...getRootProps()}
-          className="border-2 border-dashed border-cyan-500 rounded-3xl p-16 text-center cursor-pointer hover:bg-white/5 transition"
-        >
-          <input {...getInputProps()} />
+        <div className="bg-zinc-900 border border-white/10 rounded-3xl p-6">
 
-          <p className="text-xl">
-            Drag & Drop PDF Here
-          </p>
+          <div className="flex flex-col gap-4">
 
-          <p className="mt-4 text-gray-400">
-            or click to browse
-          </p>
+            <input
+              type="text"
+              placeholder="Enter Topic (Example: DBMS, Operating System, Machine Learning)"
+              value={topic}
+              onChange={(e) =>
+                setTopic(e.target.value)
+              }
+              className="bg-black border border-white/20 rounded-xl px-4 py-3 outline-none"
+            />
 
-        </div>
+            <input
+              type="number"
+              min={1}
+              value={count}
+              onChange={(e) =>
+                setCount(
+                  Number(e.target.value)
+                )
+              }
+              className="bg-black border border-white/20 rounded-xl px-4 py-3 outline-none"
+            />
 
-        {fileName && (
-          <div className="mt-6 p-4 rounded-xl bg-white/10">
-            Uploaded: {fileName}
           </div>
-        )}
 
-        {fileName && (
           <div className="flex flex-wrap gap-4 mt-6">
 
             <button
               onClick={() =>
                 askAI("summary")
               }
-              className="px-5 py-3 rounded-xl bg-cyan-600"
+              className="px-5 py-3 rounded-xl bg-cyan-600 hover:bg-cyan-700 transition"
             >
               Summary
             </button>
@@ -192,7 +216,7 @@ Answer:
               onClick={() =>
                 askAI("viva")
               }
-              className="px-5 py-3 rounded-xl bg-purple-600"
+              className="px-5 py-3 rounded-xl bg-purple-600 hover:bg-purple-700 transition"
             >
               Viva
             </button>
@@ -201,7 +225,7 @@ Answer:
               onClick={() =>
                 askAI("quiz")
               }
-              className="px-5 py-3 rounded-xl bg-green-600"
+              className="px-5 py-3 rounded-xl bg-green-600 hover:bg-green-700 transition"
             >
               Quiz
             </button>
@@ -210,17 +234,18 @@ Answer:
               onClick={() =>
                 askAI("flashcards")
               }
-              className="px-5 py-3 rounded-xl bg-orange-600"
+              className="px-5 py-3 rounded-xl bg-orange-600 hover:bg-orange-700 transition"
             >
               Flashcards
             </button>
 
           </div>
-        )}
+
+        </div>
 
         {loading && (
           <div className="mt-8 text-cyan-400">
-            Polygon is analyzing...
+            Polygon is generating content...
           </div>
         )}
 
@@ -231,7 +256,6 @@ Answer:
         )}
 
       </div>
-
     </main>
   );
 }

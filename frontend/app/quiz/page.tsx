@@ -1,179 +1,133 @@
 "use client";
 
 import { useState } from "react";
+import { askPolygon } from "../../lib/gemini";
 
 export default function QuizPage() {
   const [topic, setTopic] = useState("");
-  const [difficulty, setDifficulty] = useState("Easy");
+  const [count, setCount] = useState(10);
+  const [difficulty, setDifficulty] = useState("Medium");
 
-  const questions = [
-    {
-      question: "What is a transistor?",
-      options: [
-        "Semiconductor device",
-        "Resistor",
-        "Capacitor",
-        "Transformer",
-      ],
-      answer: 0,
-    },
-    {
-      question: "Which component stores charge?",
-      options: [
-        "Resistor",
-        "Capacitor",
-        "Diode",
-        "LED",
-      ],
-      answer: 1,
-    },
-  ];
+  const [loading, setLoading] =
+    useState(false);
 
-  const [current, setCurrent] = useState(0);
-  const [score, setScore] = useState(0);
-  const [selected, setSelected] = useState<number | null>(null);
-  const [finished, setFinished] = useState(false);
+  const [result, setResult] =
+    useState("");
 
-  function nextQuestion() {
-    if (selected === null) return;
-
-    if (selected === questions[current].answer) {
-      setScore((prev) => prev + 1);
-    }
-
-    if (current === questions.length - 1) {
-      setFinished(true);
+  async function generateQuiz() {
+    if (!topic.trim()) {
+      alert("Enter a topic");
       return;
     }
 
-    setCurrent((prev) => prev + 1);
-    setSelected(null);
-  }
+    setLoading(true);
 
-  if (finished) {
-    return (
-      <main className="min-h-screen bg-black text-white flex flex-col items-center justify-center">
-        <h1 className="text-5xl font-bold">
-          Quiz Complete 🎉
-        </h1>
+    const prompt = `
+Generate ${count} MCQ questions.
 
-        <p className="text-2xl mt-6">
-          Score: {score}/{questions.length}
-        </p>
+Topic:
+${topic}
 
-        <button
-          onClick={() => {
-            setFinished(false);
-            setCurrent(0);
-            setScore(0);
-            setSelected(null);
-          }}
-          className="mt-8 px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-purple-500"
-        >
-          Retry Quiz
-        </button>
-      </main>
-    );
+Difficulty:
+${difficulty}
+
+Format:
+
+Question
+
+A)
+B)
+C)
+D)
+
+Correct Answer
+`;
+
+    try {
+      const response =
+        await askPolygon(prompt);
+
+      setResult(response);
+
+    } catch (error) {
+      console.error(error);
+
+      setResult(
+        "Failed to generate quiz."
+      );
+    }
+
+    setLoading(false);
   }
 
   return (
-    <main className="min-h-screen bg-black text-white p-10">
+    <main className="min-h-screen bg-black text-white px-6 py-10">
 
-      <h1 className="text-5xl font-bold mb-8">
-        Polygon Quiz 🚀
-      </h1>
+      <div className="max-w-5xl mx-auto">
 
-      {/* Topic */}
-      <div className="mb-4">
-        <label className="block mb-2 text-gray-300">
-          Topic
-        </label>
-
-        <input
-          value={topic}
-          onChange={(e) => setTopic(e.target.value)}
-          placeholder="Example: Transistor"
-          className="w-full p-4 rounded-xl bg-zinc-900 border border-white/10"
-        />
-      </div>
-
-      {/* Difficulty */}
-      <div className="mb-8">
-        <label className="block mb-2 text-gray-300">
-          Difficulty
-        </label>
-
-        <select
-          value={difficulty}
-          onChange={(e) =>
-            setDifficulty(e.target.value)
-          }
-          className="w-full p-4 rounded-xl bg-zinc-900 border border-white/10"
-        >
-          <option>Easy</option>
-          <option>Medium</option>
-          <option>Hard</option>
-        </select>
-      </div>
-
-      {/* Generate Button */}
-      <button
-        className="mb-10 px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-purple-500"
-      >
-        Generate Quiz
-      </button>
-
-      {/* Progress */}
-      <div className="mb-3">
-        Question {current + 1}/{questions.length}
-      </div>
-
-      <div className="w-full h-3 bg-zinc-800 rounded mb-8">
-        <div
-          className="h-3 bg-cyan-500 rounded"
-          style={{
-            width: `${
-              ((current + 1) /
-                questions.length) *
-              100
-            }%`,
-          }}
-        />
-      </div>
-
-      {/* Question Card */}
-      <div className="bg-zinc-900 rounded-3xl p-8">
-
-        <h2 className="text-3xl mb-8">
-          {questions[current].question}
-        </h2>
+        <h1 className="text-5xl font-bold mb-8">
+          Quiz Generator
+        </h1>
 
         <div className="space-y-4">
 
-          {questions[current].options.map(
-            (option, index) => (
-              <button
-                key={index}
-                onClick={() => setSelected(index)}
-                className={`w-full text-left p-4 rounded-xl border transition ${
-                  selected === index
-                    ? "border-cyan-500 bg-cyan-500/20"
-                    : "border-white/10"
-                }`}
-              >
-                {option}
-              </button>
-            )
-          )}
+          <input
+            type="text"
+            placeholder="Enter Topic"
+            value={topic}
+            onChange={(e) =>
+              setTopic(e.target.value)
+            }
+            className="w-full p-4 rounded-xl bg-zinc-900 border border-white/10"
+          />
+
+          <input
+            type="number"
+            value={count}
+            min={1}
+            max={100}
+            onChange={(e) =>
+              setCount(
+                Number(e.target.value)
+              )
+            }
+            className="w-full p-4 rounded-xl bg-zinc-900 border border-white/10"
+          />
+
+          <select
+            value={difficulty}
+            onChange={(e) =>
+              setDifficulty(
+                e.target.value
+              )
+            }
+            className="w-full p-4 rounded-xl bg-zinc-900 border border-white/10"
+          >
+            <option>Easy</option>
+            <option>Medium</option>
+            <option>Hard</option>
+          </select>
+
+          <button
+            onClick={generateQuiz}
+            className="px-6 py-3 rounded-xl bg-cyan-600"
+          >
+            Generate Quiz
+          </button>
 
         </div>
 
-        <button
-          onClick={nextQuestion}
-          className="mt-8 px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-purple-500"
-        >
-          Next
-        </button>
+        {loading && (
+          <p className="mt-8">
+            Generating quiz...
+          </p>
+        )}
+
+        {result && (
+          <div className="mt-8 bg-zinc-900 p-6 rounded-3xl whitespace-pre-wrap">
+            {result}
+          </div>
+        )}
 
       </div>
 
