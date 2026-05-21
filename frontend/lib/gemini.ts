@@ -15,8 +15,7 @@ export async function askPolygon(
 
     const completion =
       await client.chat.completions.create({
-        model:
-          "openrouter/auto",
+        model: "openrouter/auto",
 
         messages: [
           {
@@ -28,11 +27,15 @@ export async function askPolygon(
         max_tokens: 1000,
       });
 
-    return JSON.stringify(
-  completion,
-  null,
-  2
-);
+    const message: any =
+      completion.choices?.[0]?.message;
+
+    return (
+      message?.content ||
+      message?.reasoning ||
+      "No response."
+    );
+
   } catch (error: any) {
     console.error(error);
 
