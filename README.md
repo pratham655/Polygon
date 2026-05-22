@@ -224,7 +224,7 @@ Developed by:
 
 **Pratham**
 
-Engineering Student & AI Enthusiast
+Engineering Student 
 
 ---
 
