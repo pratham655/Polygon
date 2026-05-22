@@ -10,8 +10,28 @@ export async function askPolygon(
   prompt: string
 ) {
   try {
-    const safePrompt =
-      prompt.substring(0, 3000);
+    // Increased input size
+    const safePrompt = prompt.substring(0, 10000);
+
+    const detailedPrompt = `
+You are Polygon AI, an intelligent study assistant.
+
+Provide a comprehensive, structured, and detailed answer.
+
+Requirements:
+- Clear Introduction
+- Detailed Explanation
+- Key Concepts
+- Examples
+- Advantages
+- Disadvantages (if applicable)
+- Applications
+- Important Exam Points
+- Summary
+
+Topic:
+${safePrompt}
+`;
 
     const completion =
       await client.chat.completions.create({
@@ -19,12 +39,20 @@ export async function askPolygon(
 
         messages: [
           {
+            role: "system",
+            content:
+              "You are an expert educational AI assistant that provides detailed, accurate, and student-friendly explanations.",
+          },
+          {
             role: "user",
-            content: safePrompt,
+            content: detailedPrompt,
           },
         ],
 
-        max_tokens: 1000,
+        // Increased output length
+        max_tokens: 3000,
+
+        temperature: 0.7,
       });
 
     const message: any =
@@ -33,16 +61,16 @@ export async function askPolygon(
     return (
       message?.content ||
       message?.reasoning ||
-      "No response."
+      "No response generated."
     );
 
   } catch (error: any) {
-    console.error(error);
+    console.error("Polygon AI Error:", error);
 
-    return JSON.stringify(
-      error,
-      null,
-      2
+    return (
+      error?.error?.message ||
+      error?.message ||
+      "An unexpected error occurred."
     );
   }
 }
