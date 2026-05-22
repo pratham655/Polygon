@@ -82,42 +82,44 @@ Continue until ${count} questions are generated.
 `;
         break;
 
-      case "quiz":
-        prompt = `
-Generate ${count} UNIQUE multiple-choice questions (MCQs) on:
+     case "quiz":
+  prompt = `
+Generate exactly ${count} multiple-choice questions (MCQs) on:
 
 ${topic}
 
-Requirements:
+IMPORTANT RULES:
 
-- Every question must be different.
-- Cover different subtopics of ${topic}.
-- Mix Easy, Medium and Hard difficulty levels.
-- Do NOT repeat concepts.
-- Provide exactly 4 options (A, B, C, D).
-- Mention the correct answer after every question.
-- Add a short explanation for the correct answer.
-- Make questions exam-oriented.
-- Use proper numbering.
+- DO NOT provide any introduction.
+- DO NOT explain the topic.
+- DO NOT provide study notes.
+- DO NOT provide summaries.
+- Start immediately from Question 1.
+- Generate exactly ${count} questions.
+- Every question must be unique.
+- Cover different concepts of ${topic}.
+- Include exactly four options:
+  A, B, C, D
+- Mention the correct answer.
+- Give a one-line explanation.
+- Stop after Question ${count}.
 
 Format:
 
-Question 1:
-...
+Question 1
 
 A) ...
 B) ...
 C) ...
 D) ...
 
-Correct Answer: B
+Correct Answer: A
 
-Explanation:
-...
+Explanation: ...
 
-Continue until ${count} questions are generated.
+Continue until all ${count} questions are completed.
 `;
-        break;
+  break;
 
       case "flashcards":
         prompt = `
